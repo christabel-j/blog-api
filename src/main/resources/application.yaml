@@ -1,0 +1,27 @@
+spring:
+  application:
+    # Names the application
+    name: blog
+
+  datasource:
+    # jdbc = connection type (Java Database Connectivity), h2 = database engine, mem = in-memory (RAM only), blogapi = database name
+    url: jdbc:h2:mem:blogapi
+    # sa = system administrator, default H2 username
+    username: sa
+    password: password # optional; can default to empty password
+    # Tells Spring which Java class to use to talk to H2 (auto-detected but explicit is fine)
+    driverClassName: org.h2.Driver
+
+  h2:
+    console:
+      # Enables the H2 browser console at localhost:8080/h2-console
+      enabled: true
+
+  jpa:
+    # Tells Hibernate which flavour of SQL to generate for H2
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      # create-drop = automatically create tables on startup, drop them on shutdown
+      # This is what makes @Entity classes produce actual tables
+      ddl-auto: create-drop
+    show-sql: true
