@@ -44,4 +44,15 @@ public class Post {
     @Column(name = "updated")
     private Instant updated;
 
+    @PrePersist
+    public void prePersist(){
+        Instant now = Instant.now();
+        this.created = now;
+        this.updated = now;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updated = Instant.now();
+    }
 }
