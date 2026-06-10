@@ -2,6 +2,9 @@ package com.christabelj.blog.service;
 
 // service for handling blog posts
 
+import com.christabelj.blog.domain.dto.request.CreatePostRequest;
+import com.christabelj.blog.domain.dto.request.UpdatePostRequest;
+import com.christabelj.blog.domain.dto.response.PostResponse;
 import com.christabelj.blog.domain.entity.Post;
 
 import java.util.List;
@@ -10,16 +13,16 @@ import java.util.UUID;
 public interface PostService {
 
     // create a blog post
-    Post createPost(Post post);
+    PostResponse createPost(CreatePostRequest request);
 
     // get blog post by id
-    Post getPostById(UUID id);
+    PostResponse getPostById(UUID id);
 
     // get all posts
-    List<Post> getAllPosts();
+    List<PostResponse> getAllPosts();
 
     // update a post
-    Post updatePost(UUID id, Post post);
+    PostResponse updatePost(UUID id, UpdatePostRequest request);
 
     // delete a post
     void deletePost(UUID id);

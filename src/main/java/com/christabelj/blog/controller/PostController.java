@@ -1,6 +1,9 @@
 package com.christabelj.blog.controller;
 
 
+import com.christabelj.blog.domain.dto.request.CreatePostRequest;
+import com.christabelj.blog.domain.dto.request.UpdatePostRequest;
+import com.christabelj.blog.domain.dto.response.PostResponse;
 import com.christabelj.blog.domain.entity.Post;
 import com.christabelj.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -19,27 +22,28 @@ public class PostController {
 
     // create post
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody Post post){
-        Post createdPost = postService.createPost(post);
+    public ResponseEntity<PostResponse> createPost(@RequestBody CreatePostRequest request){
+        PostResponse createdPost = postService.createPost(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
 
     // get all posts
     @GetMapping
-    public ResponseEntity<List<Post>> getAllPosts(){
+    public ResponseEntity<List<PostResponse>> getAllPosts(){
         return ResponseEntity.ok(postService.getAllPosts());
     }
 
     // get post by id
     @GetMapping(path = "/{postId}")
-    public ResponseEntity<Post> getPostById(@PathVariable UUID postId){
+    public ResponseEntity<PostResponse> getPostById(@PathVariable UUID postId){
         return ResponseEntity.ok(postService.getPostById(postId));
     }
 
     // update post
     @PutMapping(path = "/{postId}")
-    public ResponseEntity<Post> updatePost(@PathVariable UUID postId, @RequestBody Post post){
-        return ResponseEntity.ok(postService.updatePost(postId, post));
+    public ResponseEntity<PostResponse> updatePost(@PathVariable UUID postId, @RequestBody UpdatePostRequest request){
+        PostResponse response = postService.updatePost(postId, request);
+        return ResponseEntity.ok(response);
     }
 
     // delete post
