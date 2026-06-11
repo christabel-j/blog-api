@@ -6,6 +6,7 @@ import com.christabelj.blog.domain.dto.request.UpdatePostRequest;
 import com.christabelj.blog.domain.dto.response.PostResponse;
 import com.christabelj.blog.domain.entity.Post;
 import com.christabelj.blog.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class PostController {
 
     // create post
     @PostMapping
-    public ResponseEntity<PostResponse> createPost(@RequestBody CreatePostRequest request){
+    public ResponseEntity<PostResponse> createPost(@RequestBody @Valid CreatePostRequest request){
         PostResponse createdPost = postService.createPost(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
@@ -41,7 +42,7 @@ public class PostController {
 
     // update post
     @PutMapping(path = "/{postId}")
-    public ResponseEntity<PostResponse> updatePost(@PathVariable UUID postId, @RequestBody UpdatePostRequest request){
+    public ResponseEntity<PostResponse> updatePost(@PathVariable UUID postId, @Valid @RequestBody UpdatePostRequest request){
         PostResponse response = postService.updatePost(postId, request);
         return ResponseEntity.ok(response);
     }
