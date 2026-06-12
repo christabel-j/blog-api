@@ -4,6 +4,7 @@ import com.christabelj.blog.domain.dto.request.CreatePostRequest;
 import com.christabelj.blog.domain.dto.request.UpdatePostRequest;
 import com.christabelj.blog.domain.dto.response.PostResponse;
 import com.christabelj.blog.domain.entity.Post;
+import com.christabelj.blog.exception.PostNotFoundException;
 import com.christabelj.blog.mapper.PostMapper;
 import com.christabelj.blog.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponse getPostById(UUID id){
         Post post = postRepository.findById(id) // find the post in the DB by id
-                .orElseThrow(()-> new RuntimeException("Post not found"));
+                    .orElseThrow(()-> new PostNotFoundException("Post not found with id:" + id));
 
         return postMapper.toResponseDto(post); // convert entity to response dto and return it
     }
@@ -46,7 +47,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponse updatePost(UUID id, UpdatePostRequest request){
         Post toUpdate = postRepository.findById(id) // get the entity from the DB to update from the id given
-                .orElseThrow(()-> new RuntimeException("Post not found")); // if not found, throw exception
+                .orElseThrow(()-> new PostNotFoundException("Post not found with id:" + id)); // if not found, throw exception
 
         toUpdate.setTitle(request.title()); // change the title of existing entity to the one from the user's update request
         toUpdate.setContent(request.content()); // change the content of existing entity to the one from the user's update request
