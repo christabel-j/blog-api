@@ -4,7 +4,6 @@ package com.christabelj.blog.controller;
 import com.christabelj.blog.domain.dto.request.CreatePostRequest;
 import com.christabelj.blog.domain.dto.request.UpdatePostRequest;
 import com.christabelj.blog.domain.dto.response.PostResponse;
-import com.christabelj.blog.domain.entity.Post;
 import com.christabelj.blog.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
