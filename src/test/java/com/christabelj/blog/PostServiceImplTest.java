@@ -2,6 +2,7 @@ package com.christabelj.blog;
 
 import com.christabelj.blog.domain.dto.response.PostResponse;
 import com.christabelj.blog.domain.entity.Post;
+import com.christabelj.blog.exception.PostNotFoundException;
 import com.christabelj.blog.mapper.PostMapper;
 import com.christabelj.blog.repository.PostRepository;
 import com.christabelj.blog.service.PostServiceImpl;
@@ -12,9 +13,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -64,8 +66,18 @@ public class PostServiceImplTest {
         // 3) Assert
         assertNotNull(result);
         assertEquals(2, result.size());
-
     }
 
+    @Test
+    void shouldThrowExceptionWhenPostNotFound() {
+        // 1) Arrange
+        UUID id = UUID.randomUUID(); // generate id to search for post
 
+        when(postRepository.findById(id)).thenReturn(Optional.empty()); // stubbing - a post shouldn't be found hence Optional.empty()
+
+        // 2) Act & Assert
+        assertThrows(PostNotFoundException.class, ()->{
+            postService.getPostById(id);
+        });
+    }
 }
