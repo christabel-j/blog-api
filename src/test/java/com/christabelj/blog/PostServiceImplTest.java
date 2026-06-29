@@ -80,4 +80,38 @@ public class PostServiceImplTest {
             postService.getPostById(id);
         });
     }
+
+    @Test
+    void shouldReturnPostById() {
+        // 1) Arrange
+        UUID id = UUID.randomUUID();
+
+        Post post = new Post(id, null, null, null, null);
+
+        when(postRepository.findById(id)).thenReturn(Optional.of(post));
+        when(postMapper.toResponseDto(post)).thenReturn(new PostResponse(id, null, null, null, null));
+
+        // 2) Act
+        PostResponse result = postService.getPostById(id);
+
+        // 3) Assert
+        assertNotNull(result);
+        assertEquals(new PostResponse(id, null, null, null, null), result);
+    }
+
+    @Test
+    void shouldCreatePost() {
+
+    }
+
+    @Test
+    void shouldUpdatePost(){}
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingNonExistentPost() {
+
+    }
+
+    @Test
+    void shouldDeletePost(){}
 }
