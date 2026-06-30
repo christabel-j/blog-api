@@ -1,6 +1,7 @@
 package com.christabelj.blog;
 
 import com.christabelj.blog.domain.dto.request.CreatePostRequest;
+import com.christabelj.blog.domain.dto.request.UpdatePostRequest;
 import com.christabelj.blog.domain.dto.response.PostResponse;
 import com.christabelj.blog.domain.entity.Post;
 import com.christabelj.blog.exception.PostNotFoundException;
@@ -123,7 +124,30 @@ public class PostServiceImplTest {
     }
 
     @Test
-    void shouldUpdatePost(){}
+    void shouldUpdatePost(){
+        // 1) Arrange
+        UUID id = UUID.randomUUID();
+
+        Post oldPost = new Post(id, null, null, null, null);
+
+        UpdatePostRequest request = new UpdatePostRequest("Updated blog post", "My updated content");
+
+        // stubbing
+        when(postRepository.findById(id)).thenReturn(Optional.of(oldPost));
+
+        Post savedPost = new Post(id, request.title(), request.content(), null, null);
+        when(postRepository.save(oldPost)).thenReturn(savedPost);
+
+        when(postMapper.toResponseDto(savedPost)).thenReturn(new PostResponse(id, request.title(), request.content(), null, null));
+
+        // 2) Act
+        PostResponse result = postService.updatePost(id, request);
+
+        // 3) Assert
+        assertNotNull(result);
+        PostResponse expectedPostResponse = new PostResponse(id, "Updated blog post", "My updated content", null, null);
+        assertEquals(expectedPostResponse, result);
+    }
 
     @Test
     void shouldThrowExceptionWhenUpdatingNonExistentPost() {
