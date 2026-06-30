@@ -1,10 +1,12 @@
 package com.christabelj.blog;
 
+import com.christabelj.blog.domain.dto.request.CreatePostRequest;
 import com.christabelj.blog.domain.dto.response.PostResponse;
 import com.christabelj.blog.domain.entity.Post;
 import com.christabelj.blog.exception.PostNotFoundException;
 import com.christabelj.blog.mapper.PostMapper;
 import com.christabelj.blog.repository.PostRepository;
+import com.christabelj.blog.service.PostService;
 import com.christabelj.blog.service.PostServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -101,7 +103,23 @@ public class PostServiceImplTest {
 
     @Test
     void shouldCreatePost() {
+        // 1) Arrange
+        CreatePostRequest request = new CreatePostRequest("Test title", "Test content");
+        Post post = new Post();
+        Post savedPost = new Post();
+        PostResponse expectedResponse = new PostResponse(null, "Test title", "Test content", null, null);
 
+        // stubbing
+        when(postMapper.fromRequestDto(request)).thenReturn(post);
+        when(postRepository.save(post)).thenReturn(savedPost);
+        when(postMapper.toResponseDto(savedPost)).thenReturn(expectedResponse);
+
+        // 2) Act
+        PostResponse result = postService.createPost(request);
+
+        // 3) Assert
+        assertNotNull(result);
+        assertEquals(expectedResponse, result);
     }
 
     @Test
