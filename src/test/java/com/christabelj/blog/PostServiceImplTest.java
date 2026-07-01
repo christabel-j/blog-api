@@ -151,7 +151,15 @@ public class PostServiceImplTest {
 
     @Test
     void shouldThrowExceptionWhenUpdatingNonExistentPost() {
+        // 1) Arrange
+        UUID id = UUID.randomUUID();
 
+        UpdatePostRequest request = new UpdatePostRequest("title", "content");
+
+        when(postRepository.findById(id)).thenReturn(Optional.empty());
+
+        // 2) Act & Assert
+        assertThrows(PostNotFoundException.class, () -> postService.updatePost(id, request) );
     }
 
     @Test
