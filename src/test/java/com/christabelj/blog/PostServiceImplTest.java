@@ -15,12 +15,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -163,5 +165,14 @@ public class PostServiceImplTest {
     }
 
     @Test
-    void shouldDeletePost(){}
+    void shouldDeletePost(){
+        // 1) Arrange
+        UUID id = UUID.randomUUID();
+
+        // 2) Act
+        postService.deletePost(id);
+
+        // 3) Assert
+        verify(postRepository).deleteById(id);
+    }
 }
