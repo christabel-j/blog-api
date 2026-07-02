@@ -617,4 +617,128 @@ Prefix any class with a condition using `:` to apply it only in that state:
 
 ---
 
-<!-- Step 9 and beyond will be added here as we go -->
+---
+
+## Step 9 — Refactoring: Error Handling, Loading State, and API Service Layer
+
+### New Concept: Named exports vs default exports
+
+Components use **default export** — one thing per file:
+```js
+export default App           // exporting
+import App from './App.jsx'  // importing — no curly braces
+```
+
+A service file uses **named exports** — multiple things from one file:
+```js
+export function getAllPosts() { ... }  // exporting
+export function createPost() { ... }
+
+import { getAllPosts, createPost } from './api.js'  // importing — curly braces required
+```
+
+Java equivalent: multiple public static methods on a utility class.
+
+---
+
+### The API Service Layer (`api.js`)
+
+All `fetch` calls extracted into one file. Each function returns a promise — the `.then()` and `.catch()` happen in the component. The API layer's only job is making the request.
+
+```js
+const BASE_URL = '/api/v1/posts'
+
+export function getAllPosts() {
+  return fetch(BASE_URL).then(r => r.json())
+}
+
+export function createPost(title, content) {
+  return fetch(BASE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, content })
+  }).then(r => r.json())
+}
+
+export function updatePost(id, title, content) {
+  return fetch(`${BASE_URL}/${id}`, { method: 'PUT', ... }).then(r => r.json())
+}
+
+export function deletePost(id) {
+  return fetch(`${BASE_URL}/${id}`, { method: 'DELETE' })
+}
+```
+
+Spring Boot analogy: separating `@RestController` (handles HTTP) from `@Service` (handles business logic). The controller doesn't know how the data is fetched — same idea here.
+
+---
+
+### Loading State
+
+```js
+const [loading, setLoading] = useState(true)  // starts true
+
+useEffect(() => {
+  getAllPosts()
+    .then(data => setPosts(data))
+    .catch(() => setError('Could not load posts.'))
+    .finally(() => setLoading(false))  // always runs — success or failure
+}, [])
+```
+
+In JSX, return early if still loading — this renders a spinner instead of the real content:
+```jsx
+if (loading) {
+  return <div>Loading posts...</div>
+}
+```
+
+### New Concept: `.finally()`
+
+`.finally()` runs after a promise settles, regardless of success or failure — exactly like `finally` in Java's try/catch/finally.
+
+```js
+fetch(...)
+  .then(...)   // runs on success
+  .catch(...)  // runs on failure
+  .finally(...)  // always runs
+```
+
+Used here to guarantee `setLoading(false)` always fires, so the spinner never gets stuck.
+
+---
+
+### Error Handling
+
+```js
+const [error, setError] = useState(null)  // null = no error
+
+getAllPosts()
+  .then(data => setPosts(data))
+  .catch(() => setError('Could not load posts. Is the backend running?'))
+```
+
+Displaying the error conditionally in JSX:
+```jsx
+{error && (
+  <div className="bg-red-50 text-red-700 ...">
+    {error}
+  </div>
+)}
+```
+
+`{error && <div>...}` — if `error` is `null` (falsy), nothing renders. If it's a string (truthy), the div renders. This is React's **short-circuit rendering** pattern.
+
+Each component has its own independent error state — a delete failure on one card doesn't affect the others.
+
+---
+
+### What we refactored and why
+
+| Before | After | Why |
+|---|---|---|
+| `fetch` calls scattered in `App` and `PostCard` | All in `api.js` | Single place to change if the API URL changes |
+| No `.catch()` anywhere | `.catch()` on every call | Silent failures become visible errors |
+| Page blank during initial load | "Loading..." shown | Makes the empty state intentional, not broken |
+| `loading` had no off-switch on failure | `.finally()` always sets loading false | Spinner can never get permanently stuck |
+

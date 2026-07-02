@@ -1,31 +1,34 @@
 import { useState } from 'react'
+import { updatePost, deletePost } from './api.js'
 
 function PostCard({ post, onUpdate, onDelete }) {
   const [isEditing, setIsEditing] = useState(false)
   const [title, setTitle] = useState(post.title)
   const [content, setContent] = useState(post.content)
+  const [error, setError] = useState(null)
 
   function handleDelete() {
-    fetch(`/api/v1/posts/${post.id}`, { method: 'DELETE' })
+    deletePost(post.id)
       .then(() => onDelete(post.id))
+      .catch(() => setError('Failed to delete post.'))
   }
 
   function handleSave() {
-    fetch(`/api/v1/posts/${post.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content })
-    })
-      .then(response => response.json())
+    updatePost(post.id, title, content)
       .then(updatedPost => {
         onUpdate(updatedPost)
         setIsEditing(false)
+        setError(null)
       })
+      .catch(() => setError('Failed to save changes.'))
   }
 
   if (isEditing) {
     return (
       <div className="bg-white rounded-xl shadow p-6">
+        {error && (
+          <p className="text-red-600 text-sm mb-3">{error}</p>
+        )}
         <input
           type="text"
           value={title}
@@ -46,7 +49,7 @@ function PostCard({ post, onUpdate, onDelete }) {
             Save
           </button>
           <button
-            onClick={() => setIsEditing(false)}
+            onClick={() => { setIsEditing(false); setError(null) }}
             className="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium px-4 py-1.5 rounded-lg transition-colors"
           >
             Cancel
@@ -60,6 +63,9 @@ function PostCard({ post, onUpdate, onDelete }) {
     <div className="bg-white rounded-xl shadow p-6">
       <h2 className="text-xl font-semibold text-gray-900 mb-2">{post.title}</h2>
       <p className="text-gray-600 text-sm mb-4">{post.content}</p>
+      {error && (
+        <p className="text-red-600 text-sm mb-3">{error}</p>
+      )}
       <div className="flex gap-2">
         <button
           onClick={() => setIsEditing(true)}
